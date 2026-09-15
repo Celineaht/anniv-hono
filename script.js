@@ -555,7 +555,9 @@ function eteindre(bougie) {
 
   if (bougie.dataset.magique && !magieUtilisee) {
     magieUtilisee = true;
+    bougie.dataset.rallume = "1";
     setTimeout(() => {
+      delete bougie.dataset.rallume;
       bougie.classList.remove("out");
       messageGateau.textContent = "Hihi, bougie magique 😈 Souffle plus fort !";
       messageGateau.hidden = false;
@@ -563,8 +565,10 @@ function eteindre(bougie) {
     return;
   }
 
-  if (!zoneBougies.querySelector(".candle:not(.out)")) {
+  // La bougie magique sur le point de se rallumer compte encore comme allumée
+  if (!zoneBougies.querySelector(".candle:not(.out), .candle[data-rallume]")) {
     arreterMicro();
+    boutonMicro.hidden = true;
     messageGateau.textContent = "Fais un vœu !! 🌟";
     messageGateau.hidden = false;
     pluieDeConfettis(3000);
@@ -573,32 +577,58 @@ function eteindre(bougie) {
 }
 
 const boutonMicro = document.getElementById("mic-btn");
+const jaugeMicro = document.getElementById("mic-meter");
 let flux = null;
 
 boutonMicro.addEventListener("click", async () => {
+  if (flux) return arreterMicro();
+
+  // Créé tout de suite, pendant le clic, sinon le navigateur peut le laisser en pause
+  const ctx = new AudioContext();
   try {
-    flux = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Sans ces options, l'anti-bruit du navigateur efface le souffle
+    flux = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+    });
   } catch {
+    ctx.close();
     boutonMicro.textContent = "Micro indisponible, clique sur les flammes 😉";
     return;
   }
-  boutonMicro.textContent = "Souffle maintenant !! 🌬️";
+  await ctx.resume();
+  boutonMicro.textContent = "Souffle maintenant !! 🌬️ (clique pour arrêter)";
+  jaugeMicro.hidden = false;
 
-  const ctx = new AudioContext();
   const analyseur = ctx.createAnalyser();
-  analyseur.fftSize = 512;
+  analyseur.fftSize = 1024;
   ctx.createMediaStreamSource(flux).connect(analyseur);
-  const donnees = new Uint8Array(analyseur.fftSize);
+  const donnees = new Float32Array(analyseur.fftSize);
+  const debut = performance.now();
+  let bruitAmbiant = 0;
+  let framesFortes = 0;
   let dernierSouffle = 0;
 
   (function ecouter() {
     if (!flux) return ctx.close();
-    analyseur.getByteTimeDomainData(donnees);
+    analyseur.getFloatTimeDomainData(donnees);
     let somme = 0;
-    for (const v of donnees) somme += ((v - 128) / 128) ** 2;
+    for (const v of donnees) somme += v * v;
     const volume = Math.sqrt(somme / donnees.length);
-    if (volume > 0.18 && performance.now() - dernierSouffle > 150) {
-      dernierSouffle = performance.now();
+    const maintenant = performance.now();
+
+    // Première demi-seconde : on mesure le bruit de la pièce
+    if (maintenant - debut < 500) {
+      bruitAmbiant = Math.max(bruitAmbiant, volume);
+      return requestAnimationFrame(ecouter);
+    }
+    const seuil = Math.max(0.04, bruitAmbiant * 3);
+    jaugeMicro.firstElementChild.style.width = `${Math.min(100, (volume / seuil) * 60)}%`;
+    jaugeMicro.classList.toggle("fort", volume > seuil);
+
+    // Un souffle = son fort pendant quelques images d'affilée
+    framesFortes = volume > seuil ? framesFortes + 1 : 0;
+    if (framesFortes >= 3 && maintenant - dernierSouffle > 300) {
+      dernierSouffle = maintenant;
       const allumee = zoneBougies.querySelector(".candle:not(.out)");
       if (allumee) eteindre(allumee);
     }
@@ -610,7 +640,8 @@ function arreterMicro() {
   if (!flux) return;
   flux.getTracks().forEach((t) => t.stop());
   flux = null;
-  boutonMicro.hidden = true;
+  jaugeMicro.hidden = true;
+  boutonMicro.textContent = "🎤 Souffler pour de vrai";
 }
 
 /* ----- Carte à gratter ----- */
