@@ -29,6 +29,17 @@ const CADEAUX_ROUE = [
 
 const NB_BOUGIES = 5;
 
+// Le message de la carte : un morceau par jeu gagné.
+const MESSAGE_CARTE = [
+  { jeu: "attrape", nom: "Attrape tes cadeaux", texte: "Joyeux anniversaire ma Honorine !! 🎉" },
+  { jeu: "roue", nom: "La roue des cadeaux", texte: "Tu es la preuve qu'on peut être une vraie diva, une boss lady ET la personne la plus drôle de la pièce." },
+  { jeu: "bougies", nom: "Souffle tes bougies", texte: "Merci pour les fous rires, les selfies avec tes lunettes iconiques et ta façon unique de rendre chaque journée plus belle." },
+  { jeu: "grattage", nom: "Gratte le ticket", texte: "Je te souhaite une année pleine d'amour, de succès, de voyages et de paillettes. Continue de briller, reine 👑" },
+];
+const SIGNATURE = "Avec tout mon amour, Céline 💖";
+
+const SCORE_POUR_GAGNER = 15;
+
 /* ========================================================= */
 
 const COULEURS = ["#ff4fa3", "#ffd84d", "#8b5cf6", "#7ce0c3", "#ffffff"];
@@ -47,6 +58,88 @@ function pluieDeConfettis(duree = 2500) {
     if (Date.now() < fin) requestAnimationFrame(frame);
   })();
 }
+
+/* ----- Progression : les cadenas de la carte ----- */
+const CLE_PROGRESSION = "hono-carte";
+const lignesCarte = document.getElementById("card-lines");
+const carte = document.getElementById("card");
+const indiceCarte = document.getElementById("card-hint");
+const boutonCarte = document.getElementById("card-cta");
+const pastille = document.getElementById("progress-pill");
+const toast = document.getElementById("toast");
+const texteToast = document.getElementById("toast-text");
+
+let debloques = new Set();
+try { debloques = new Set(JSON.parse(localStorage.getItem(CLE_PROGRESSION)) || []); } catch { /* stockage indisponible */ }
+
+MESSAGE_CARTE.forEach((morceau, i) => {
+  const ligne = document.createElement("div");
+  ligne.className = "card-line";
+  ligne.dataset.jeu = morceau.jeu;
+  ligne.innerHTML = `<a class="line-lock" href="#jeu-${i + 1}">🔒 Jeu ${i + 1} : ${morceau.nom}</a><p class="line-text"></p>`;
+  ligne.querySelector(".line-text").textContent = morceau.texte;
+  lignesCarte.appendChild(ligne);
+});
+document.getElementById("card-sign").textContent = SIGNATURE;
+
+function majCarte() {
+  const total = MESSAGE_CARTE.length;
+  const nb = debloques.size;
+  lignesCarte.querySelectorAll(".card-line").forEach((ligne) => {
+    ligne.classList.toggle("unlocked", debloques.has(ligne.dataset.jeu));
+  });
+  document.querySelectorAll("[data-badge]").forEach((badge) => {
+    const ok = debloques.has(badge.dataset.badge);
+    badge.textContent = ok ? "✅ cadenas ouvert" : "🔒 cadenas fermé";
+    badge.classList.toggle("ok", ok);
+  });
+  const complete = nb === total;
+  carte.classList.toggle("complete", complete);
+  pastille.textContent = complete ? "💌 Carte ouverte" : `🔒 ${nb}/${total}`;
+  indiceCarte.textContent = complete
+    ? "Tous les cadenas sont ouverts, bravo !! 🎉"
+    : nb === 0
+      ? "4 cadenas à ouvrir. Les jeux sont juste en dessous 👇"
+      : `Encore ${total - nb} cadenas à ouvrir, courage 💪`;
+  boutonCarte.hidden = complete;
+  const prochain = MESSAGE_CARTE.findIndex((m) => !debloques.has(m.jeu));
+  boutonCarte.href = `#jeu-${prochain + 1}`;
+  boutonCarte.textContent = nb === 0 ? "Commencer les jeux 🎮" : "Jeu suivant 🎮";
+}
+
+let minuteurToast = null;
+function afficherToast(texte) {
+  texteToast.textContent = texte;
+  toast.hidden = false;
+  clearTimeout(minuteurToast);
+  minuteurToast = setTimeout(() => (toast.hidden = true), 4000);
+}
+toast.querySelector(".toast-link").addEventListener("click", () => (toast.hidden = true));
+
+function debloquer(jeu) {
+  if (debloques.has(jeu)) return;
+  debloques.add(jeu);
+  try { localStorage.setItem(CLE_PROGRESSION, JSON.stringify([...debloques])); } catch { /* stockage indisponible */ }
+  majCarte();
+
+  if (debloques.size === MESSAGE_CARTE.length) {
+    afficherToast("💌 Dernier cadenas ouvert ! Ta carte est prête");
+    setTimeout(() => {
+      document.getElementById("carte").scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => pluieDeConfettis(4000), 700);
+    }, 1800);
+  } else {
+    afficherToast(`🔓 Cadenas ${debloques.size}/${MESSAGE_CARTE.length} ouvert !`);
+  }
+}
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  try { localStorage.removeItem(CLE_PROGRESSION); } catch { /* stockage indisponible */ }
+  location.hash = "";
+  location.reload();
+});
+
+majCarte();
 
 /* ----- Intro : le bouton « non » s'enfuit ----- */
 const intro = document.getElementById("intro");
@@ -346,6 +439,13 @@ function finirJeu() {
   else if (score >= 10) texte = `${score} points… on s'entraîne encore ? 😅`;
   else texte = `${score} points. Les brocolis ont gagné 🥦`;
 
+  if (score >= SCORE_POUR_GAGNER) {
+    texte += "\nCadenas ouvert 🔓";
+    debloquer("attrape");
+  } else {
+    texte += `\nIl faut ${SCORE_POUR_GAGNER} points pour ouvrir le cadenas 🔒`;
+  }
+
   if (score > record) {
     record = score;
     affRecord.textContent = record;
@@ -430,6 +530,7 @@ roue.addEventListener("transitionend", () => {
   boutonRoue.disabled = false;
   boutonRoue.textContent = "Retenter (tricheuse) 🎡";
   confettis();
+  debloquer("roue");
 });
 
 /* ----- Gâteau : une bougie magique qui se rallume ----- */
@@ -467,6 +568,7 @@ function eteindre(bougie) {
     messageGateau.textContent = "Fais un vœu !! 🌟";
     messageGateau.hidden = false;
     pluieDeConfettis(3000);
+    debloquer("bougies");
   }
 }
 
@@ -563,6 +665,7 @@ function verifierGrattage() {
     grattee = true;
     carteGratter.classList.add("done");
     pluieDeConfettis(2000);
+    debloquer("grattage");
   }
 }
 
@@ -594,13 +697,13 @@ boutonDiva.addEventListener("click", () => {
 const messagePartage = document.getElementById("share-msg");
 
 document.getElementById("share-btn").addEventListener("click", async () => {
-  const donnees = { title: document.title, text: "Viens fêter l'anniv d'Honorine et battre son record 🎉", url: location.href };
+  const donnees = { title: document.title, text: "Viens voir la carte d'anniv d'Honorine et battre son record 🎉", url: location.href.split("#")[0] };
   if (navigator.share) {
     try { await navigator.share(donnees); } catch { /* partage annulé */ }
     return;
   }
   try {
-    await navigator.clipboard.writeText(location.href);
+    await navigator.clipboard.writeText(donnees.url);
     messagePartage.hidden = false;
     setTimeout(() => (messagePartage.hidden = true), 2500);
   } catch { /* presse-papiers indisponible */ }

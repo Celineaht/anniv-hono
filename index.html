@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JOYEUX ANNIV HONORINE 💖</title>
-  <meta name="description" content="Le site officiel de l'anniversaire d'Honorine. Attention : contient des confettis.">
-  <meta property="og:title" content="JOYEUX ANNIV HONORINE 💖">
+  <title>Une carte pour Honorine 💌</title>
+  <meta name="description" content="Une carte d'anniversaire bien cachée derrière 4 cadenas. À toi de jouer !">
+  <meta property="og:title" content="Une carte pour Honorine 💌">
   <meta property="og:image" content="photos/ok.jpg">
-  <meta property="og:description" content="Viens jouer, gratter, tourner la roue et souffler les bougies 🎂">
+  <meta property="og:description" content="Gagne les 4 jeux pour débloquer ta carte d'anniversaire 🔒">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
@@ -18,8 +18,8 @@
   <!-- ===== Intro ===== -->
   <div id="intro" class="intro">
     <div class="intro-card">
-      <p class="intro-emoji">👑</p>
-      <h1 class="intro-title">Honorine,<br>t'es prête pour ta surprise ?</h1>
+      <p class="intro-emoji">💌</p>
+      <h1 class="intro-title">Honorine,<br>t'es prête pour ta carte d'anniv' ?</h1>
       <div class="intro-buttons">
         <button id="yes-btn" class="btn btn-big">OUIII 💅</button>
         <button id="no-btn" class="btn btn-no">non</button>
@@ -29,6 +29,12 @@
 
   <div id="disco" class="disco" aria-hidden="true"><span class="disco-ball">🪩</span></div>
   <button id="diva-btn" class="diva-btn">💃 Mode DIVA</button>
+  <a href="#carte" id="progress-pill" class="progress-pill">🔒 0/4</a>
+
+  <div id="toast" class="toast" hidden>
+    <span id="toast-text"></span>
+    <a href="#carte" class="toast-link">Lire 💌</a>
+  </div>
 
   <main>
     <!-- ===== Accueil ===== -->
@@ -43,21 +49,31 @@
       <img src="photos/ok.jpg" alt="Honorine" class="hero-photo">
       <p class="tag">Joyeux anniv' !!!</p>
       <h2 id="name" class="name" aria-label="Honorine">Honorine</h2>
-      <p class="hero-sub">La reine du jour, c'est toi 👑<br><small>(clique sur les lettres, pour voir)</small></p>
-      <a href="#photos" class="btn">C'est parti ↓</a>
+      <p class="hero-sub">Ta carte est cachée derrière <b>4 cadenas</b> 🔒<br>Gagne les jeux pour la débloquer !<br><small>(psst : clique sur les lettres)</small></p>
+      <a href="#carte" class="btn">Voir ma carte ↓</a>
     </section>
 
-    <!-- ===== Mur de photos ===== -->
-    <section id="photos" class="section">
-      <h2 class="title"><span>Le mur</span> des souvenirs</h2>
-      <p class="hint">Déplace les photos comme tu veux, clique pour les agrandir 📸</p>
-      <div id="wall" class="wall"></div>
+    <!-- ===== La carte ===== -->
+    <section id="carte" class="section section-pink">
+      <h2 class="title"><span>Ta carte</span> d'anniv'</h2>
+      <p id="card-hint" class="hint">4 cadenas à ouvrir. Les jeux sont juste en dessous 👇</p>
+
+      <div id="card" class="card">
+        <img src="photos/pardon.jpg" alt="" class="card-photo">
+        <p class="card-to">Pour Honorine 💌</p>
+        <div id="card-lines" class="card-lines"></div>
+        <p id="card-sign" class="card-sign"></p>
+        <span class="card-stamp">Débloquée !</span>
+      </div>
+
+      <a href="#jeu-1" id="card-cta" class="btn btn-big">Commencer les jeux 🎮</a>
     </section>
 
-    <!-- ===== Jeu ===== -->
-    <section class="section section-pink">
+    <!-- ===== Jeu 1 : attrape ===== -->
+    <section id="jeu-1" class="section">
+      <p class="game-label">Jeu 1/4 · <span data-badge="attrape">🔒 cadenas fermé</span></p>
       <h2 class="title"><span>Attrape</span> tes cadeaux</h2>
-      <p class="hint">Attrape 🎁🍰🥂💄👠💐 et évite les 🥦 et les ⏰ !</p>
+      <p class="hint">Attrape 🎁🍰🥂💄👠💐 et évite les 🥦 et les ⏰<br><b>15 points pour ouvrir le cadenas !</b></p>
       <div class="game-scores">
         <span>Score : <b id="score">0</b></span>
         <span>⏱ <b id="timer">30</b>s</span>
@@ -72,10 +88,11 @@
       </div>
     </section>
 
-    <!-- ===== Roue ===== -->
-    <section class="section">
+    <!-- ===== Jeu 2 : roue ===== -->
+    <section id="jeu-2" class="section section-lilac">
+      <p class="game-label">Jeu 2/4 · <span data-badge="roue">🔒 cadenas fermé</span></p>
       <h2 class="title"><span>La roue</span> des cadeaux</h2>
-      <p class="hint">Un seul essai… (bon ok, t'as le droit de tricher)</p>
+      <p class="hint">Tourne la roue pour gagner un cadeau (et un cadenas)</p>
       <div class="wheel-wrap">
         <div class="wheel-pointer">▼</div>
         <canvas id="wheel" class="wheel" width="460" height="460"></canvas>
@@ -84,10 +101,11 @@
       <p id="wheel-result" class="result" hidden></p>
     </section>
 
-    <!-- ===== Gâteau ===== -->
-    <section class="section section-lilac">
+    <!-- ===== Jeu 3 : gâteau ===== -->
+    <section id="jeu-3" class="section">
+      <p class="game-label">Jeu 3/4 · <span data-badge="bougies">🔒 cadenas fermé</span></p>
       <h2 class="title"><span>Souffle</span> tes bougies</h2>
-      <p class="hint">Clique sur les flammes… ou souffle dans ton micro 🌬️</p>
+      <p class="hint">Clique sur les flammes… ou souffle dans ton micro 🌬️<br>Attention, il y a une bougie coquine 😈</p>
       <div class="cake-wrap">
         <div class="cake">
           <div id="candles" class="candles"></div>
@@ -101,29 +119,41 @@
       <button id="mic-btn" class="btn btn-outline">🎤 Souffler pour de vrai</button>
     </section>
 
-    <!-- ===== Carte à gratter ===== -->
-    <section class="section">
-      <h2 class="title"><span>Message</span> secret</h2>
-      <p class="hint">Gratte la carte 🪙</p>
+    <!-- ===== Jeu 4 : grattage ===== -->
+    <section id="jeu-4" class="section section-pink">
+      <p class="game-label">Jeu 4/4 · <span data-badge="grattage">🔒 cadenas fermé</span></p>
+      <h2 class="title"><span>Gratte</span> le ticket</h2>
+      <p class="hint">Dernier cadenas ! Gratte pour découvrir ton lot 🪙</p>
       <div class="scratch">
         <div class="scratch-message">
-          <p class="scratch-big">On t'aime fort ❤️</p>
-          <p>Merci d'être toi. Que cette année soit remplie de fous rires, de voyages, de paillettes et de tout ce qui te rend heureuse.</p>
+          <p class="scratch-big">🎟️ GAGNÉ !</p>
+          <p>Bon pour <b>un énorme câlin</b>, valable à vie, sans date d'expiration.</p>
         </div>
         <canvas id="scratch-canvas" class="scratch-canvas"></canvas>
       </div>
     </section>
 
+    <!-- ===== Bonus : photos ===== -->
+    <section id="photos" class="section">
+      <p class="game-label">Bonus</p>
+      <h2 class="title"><span>Le mur</span> des souvenirs</h2>
+      <p class="hint">Déplace les photos comme tu veux, clique pour les agrandir 📸</p>
+      <div id="wall" class="wall"></div>
+    </section>
+
     <!-- ===== Partage ===== -->
-    <section class="section section-pink finale">
-      <h2 class="title"><span>Fais</span> tourner !</h2>
-      <p class="hint">Envoie le site à la team pour qu'ils battent ton record 😏</p>
+    <section class="section section-lilac finale">
+      <h2 class="title"><span>Montre</span> ta carte !</h2>
+      <p class="hint">Envoie-la à la team… et défie-les de battre ton record 😏</p>
       <button id="share-btn" class="btn btn-big">Partager 🔗</button>
       <p id="share-msg" class="hint" hidden>Lien copié ✅</p>
     </section>
   </main>
 
-  <footer class="footer">Fait avec 💖 (et beaucoup de confettis) pour Honorine</footer>
+  <footer class="footer">
+    Fait avec 💖 (et beaucoup de confettis) pour Honorine
+    <br><button id="reset-btn" class="link-btn">Refermer les cadenas et rejouer</button>
+  </footer>
 
   <!-- Visionneuse -->
   <div id="lightbox" class="lightbox" hidden>
