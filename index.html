@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOYEUX ANNIV HONORINE 💖</title>
+  <meta name="description" content="Le site officiel de l'anniversaire d'Honorine. Attention : contient des confettis.">
+  <meta property="og:title" content="JOYEUX ANNIV HONORINE 💖">
+  <meta property="og:image" content="photos/ok.jpg">
+  <meta property="og:description" content="Viens jouer, gratter, tourner la roue et souffler les bougies 🎂">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Intro ===== -->
+  <div id="intro" class="intro">
+    <div class="intro-card">
+      <p class="intro-emoji">👑</p>
+      <h1 class="intro-title">Honorine,<br>t'es prête pour ta surprise ?</h1>
+      <div class="intro-buttons">
+        <button id="yes-btn" class="btn btn-big">OUIII 💅</button>
+        <button id="no-btn" class="btn btn-no">non</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="disco" class="disco" aria-hidden="true"><span class="disco-ball">🪩</span></div>
+  <button id="diva-btn" class="diva-btn">💃 Mode DIVA</button>
+
+  <main>
+    <!-- ===== Accueil ===== -->
+    <section class="hero">
+      <span class="sticker s1">💖</span>
+      <span class="sticker s2">✨</span>
+      <span class="sticker s3">🍾</span>
+      <span class="sticker s4">🎀</span>
+      <span class="sticker s5">🥳</span>
+      <span class="sticker s6">💄</span>
+
+      <img src="photos/ok.jpg" alt="Honorine" class="hero-photo">
+      <p class="tag">Joyeux anniv' !!!</p>
+      <h2 id="name" class="name" aria-label="Honorine">Honorine</h2>
+      <p class="hero-sub">La reine du jour, c'est toi 👑<br><small>(clique sur les lettres, pour voir)</small></p>
+      <a href="#photos" class="btn">C'est parti ↓</a>
+    </section>
+
+    <!-- ===== Mur de photos ===== -->
+    <section id="photos" class="section">
+      <h2 class="title"><span>Le mur</span> des souvenirs</h2>
+      <p class="hint">Déplace les photos comme tu veux, clique pour les agrandir 📸</p>
+      <div id="wall" class="wall"></div>
+    </section>
+
+    <!-- ===== Jeu ===== -->
+    <section class="section section-pink">
+      <h2 class="title"><span>Attrape</span> tes cadeaux</h2>
+      <p class="hint">Attrape 🎁🍰🥂💄👠💐 et évite les 🥦 et les ⏰ !</p>
+      <div class="game-scores">
+        <span>Score : <b id="score">0</b></span>
+        <span>⏱ <b id="timer">30</b>s</span>
+        <span>Record : <b id="best">0</b></span>
+      </div>
+      <div id="game" class="game">
+        <div id="player" class="player"><img src="photos/tete.jpg" alt=""><span>👜</span></div>
+        <div id="game-overlay" class="game-overlay">
+          <p id="game-msg" class="game-msg">Aide Honorine à attraper ses cadeaux !<br><small>Bouge ta souris ou ton doigt</small></p>
+          <button id="game-start" class="btn">Jouer 🎮</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Roue ===== -->
+    <section class="section">
+      <h2 class="title"><span>La roue</span> des cadeaux</h2>
+      <p class="hint">Un seul essai… (bon ok, t'as le droit de tricher)</p>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="wheel" class="wheel" width="460" height="460"></canvas>
+      </div>
+      <button id="spin-btn" class="btn btn-big">Tourner 🎡</button>
+      <p id="wheel-result" class="result" hidden></p>
+    </section>
+
+    <!-- ===== Gâteau ===== -->
+    <section class="section section-lilac">
+      <h2 class="title"><span>Souffle</span> tes bougies</h2>
+      <p class="hint">Clique sur les flammes… ou souffle dans ton micro 🌬️</p>
+      <div class="cake-wrap">
+        <div class="cake">
+          <div id="candles" class="candles"></div>
+          <div class="cake-drip"></div>
+          <div class="cake-layer top"></div>
+          <div class="cake-layer bottom"></div>
+          <div class="cake-plate"></div>
+        </div>
+      </div>
+      <p id="cake-msg" class="result" hidden></p>
+      <button id="mic-btn" class="btn btn-outline">🎤 Souffler pour de vrai</button>
+    </section>
+
+    <!-- ===== Carte à gratter ===== -->
+    <section class="section">
+      <h2 class="title"><span>Message</span> secret</h2>
+      <p class="hint">Gratte la carte 🪙</p>
+      <div class="scratch">
+        <div class="scratch-message">
+          <p class="scratch-big">On t'aime fort ❤️</p>
+          <p>Merci d'être toi. Que cette année soit remplie de fous rires, de voyages, de paillettes et de tout ce qui te rend heureuse.</p>
+        </div>
+        <canvas id="scratch-canvas" class="scratch-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- ===== Partage ===== -->
+    <section class="section section-pink finale">
+      <h2 class="title"><span>Fais</span> tourner !</h2>
+      <p class="hint">Envoie le site à la team pour qu'ils battent ton record 😏</p>
+      <button id="share-btn" class="btn btn-big">Partager 🔗</button>
+      <p id="share-msg" class="hint" hidden>Lien copié ✅</p>
+    </section>
+  </main>
+
+  <footer class="footer">Fait avec 💖 (et beaucoup de confettis) pour Honorine</footer>
+
+  <!-- Visionneuse -->
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lb-close" aria-label="Fermer">×</button>
+    <button class="lb-prev" aria-label="Photo précédente">‹</button>
+    <figure class="lb-figure">
+      <img id="lb-img" alt="">
+      <figcaption id="lb-caption"></figcaption>
+    </figure>
+    <button class="lb-next" aria-label="Photo suivante">›</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
